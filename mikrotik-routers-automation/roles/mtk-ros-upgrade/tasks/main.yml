@@ -1,0 +1,22 @@
+---
+- name: set routeros firmware channel
+  routeros_command:
+    commands:
+      - /system package update set channel=stable
+
+
+- name: Check if an update is needed
+      routeros_command:
+        commands: "[:put ([/system packa up get status])]"
+      register: output
+      
+- name: print variable
+     debug:
+       msg: "{{ output }}"
+
+- name: upgrade packages and reboot
+  routeros_command:
+    commands:
+      - /system package update install
+  when: output.stdout is search('available')
+
